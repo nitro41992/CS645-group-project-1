@@ -21,33 +21,29 @@ public class SimpleCracker {
         String[] shadow_simple = simpleCracker.parse_file("shadow-simple.txt");
         String[] passwords = simpleCracker.parse_file("common-passwords.txt");
 
-        // Instantiate Salt String Array
-        String salt[] = new String[10];
+        // Declare salt string
+        String salt;
 
+        // Loop to process all users in shadow file
         int match_count = 0;
-        for (int i = 0; i < salt.length; i++) {
+        for (int i = 0; i < shadow_simple.length; i++) {
 
             // Extract salt using regex split
-            salt[i] = shadow_simple[i].split("[:]")[1].trim();
+            salt = shadow_simple[i].split("[:]")[1].trim();
             for (int j = 0; j < passwords.length; j++) {
 
                 // Concatenate salt with common-password hash
-                String concat = salt[i] + passwords[j];
+                String concat = salt + passwords[j];
 
                 // Use Message Direct to create concatenated hash
                 String MD5 = SimpleCracker.messageDigest(concat);
 
-                // Loop through shadow lines and compare each concatenated hash with user password hashes in shadow-simple.txt
-                for (int k = 0; k <= shadow_simple.length - 1; k++) {
-
-                    // Conditional to check for matches between concatenated hash and user password hashes
-                    if (MD5.equals(shadow_simple[k].split("[:]")[2].trim())) {
-                        System.out.println(shadow_simple[i].split("[:]")[0].trim() + ":" + passwords[j]);
-                        match_count++;
-                        break;
-                    }
+                // Conditional to check for matches between concatenated hash and user password hashes
+                if (MD5.equals(shadow_simple[i].split("[:]")[2].trim())) {
+                	System.out.println(shadow_simple[i].split("[:]")[0].trim() + ":" + passwords[j]);
+                	match_count++;
+                	break;
                 }
-
             }
         }
         if (match_count == 0) {
@@ -61,7 +57,7 @@ public class SimpleCracker {
     public static String messageDigest(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 
         MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-        byte[] hash = new byte[32];
+        byte[] hash; 
 
         messageDigest.update(text.getBytes("UTF-8"), 0, text.length());
         hash = messageDigest.digest();

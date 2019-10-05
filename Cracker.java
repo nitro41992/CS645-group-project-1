@@ -2,9 +2,7 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.FileReader;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,34 +16,29 @@ public class Cracker {
         Cracker cracker = new Cracker();
 
         // Create String Arrays of shadow-simple and common-passwords files
-        String[] shadow_simple = cracker.parse_file("shadow.txt");
+        String[] shadow = cracker.parse_file("shadow.txt");
         String[] passwords = cracker.parse_file("common-passwords.txt");
 
         // Instantiate Salt String Array
-        String salt[] = new String[10];
+        String salt; 
 
-    
+        // Loop to process all users in shadow file
         int match_count = 0;
-        for (int i = 0; i < salt.length; i++) {
+        for (int i = 0; i < shadow.length; i++) {
 
             //Extract salt using regex split
-            salt[i] = shadow_simple[i].split("[$:]")[3].trim();
+            salt = shadow[i].split("[$:]")[3].trim();
             for (int j = 0; j < passwords.length; j++) {
 
                 //Use MD5Shadow crypt method to create concatenated hash
-                String MD5 = MD5Shadow.crypt(passwords[j], salt[i]);
+                String MD5 = MD5Shadow.crypt(passwords[j], salt);
 
-                //Loop through shadow lines and compare each concatenated hash with user password hashes in shadow-simple.txt
-                for (int k = 0; k <= shadow_simple.length - 1; k++) {
-
-                    //conditional to check for matches between concatenated hash and user password hashes
-                    if (MD5.equals(shadow_simple[k].split("[$:]")[4].trim())) {
-                        System.out.println(shadow_simple[i].split("[:]")[0].trim() + ":" + passwords[j]);
-                        match_count++;
-                        break;
-                    }
+                //conditional to check for matches between concatenated hash and user password hashes
+                if (MD5.equals(shadow[i].split("[$:]")[4].trim())) {
+                    System.out.println(shadow[i].split("[:]")[0].trim() + ":" + passwords[j]);
+                    match_count++;
+                    break;
                 }
-
             }
         }
         if (match_count == 0) {
@@ -55,19 +48,6 @@ public class Cracker {
 
     }
     
-    //Using MessageDigest to obtain the cryptographic hash of a string of characters
-    public static String messageDigest(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-
-        MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-        byte[] hash = new byte[32];
-
-        messageDigest.update(text.getBytes("UTF-8"), 0, text.length());
-        hash = messageDigest.digest();
-        
-        return toHex(hash);
-
-    }
-
     //Converts a byte array into a String that contains the hexadecimal representation of the byte array
     public static String toHex(byte[] data) {
 
