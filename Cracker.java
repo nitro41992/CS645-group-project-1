@@ -16,7 +16,7 @@ public class Cracker {
         Cracker cracker = new Cracker();
 
         // Create String Arrays of shadow-simple and common-passwords files
-        String[] shadow = cracker.parse_file("shadow.txt");
+        String[] shadow = cracker.parse_file("shadow");
         String[] passwords = cracker.parse_file("common-passwords.txt");
 
         // Instantiate Salt String Array
